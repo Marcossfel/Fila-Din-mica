@@ -13,52 +13,55 @@ typedef struct No{
 	struct No *prox;
 }No;
 
-typedef struct Pilha{
-	No *topo;
-}Pilha;
+typedef struct Fila{
+	No *inicio;
+	No *fim;
+}Fila;
 
-void iniciaPilha( Pilha *p){
-	p->topo = NULL;
-	
+void iniciaFila( Fila *f){
+	f->inicio = NULL;
+	f->fim = NULL;
 }
 
-void inseriPilha( t_aluno dado, Pilha *p){
+void inseriFila( t_aluno dado, Fila *f){
 	No *aux = (No*) malloc(sizeof(No));
 	if(aux == NULL){
 		printf("Erro de alocação.\n");
 		return;
 	} else {
 		aux->dado = dado;
-		aux->prox = p->topo;
-		p->topo = aux;
+		aux->prox = NULL;
+		if(f->inicio == NULL){
+			f->inicio = aux;
+		} else {
+			f->fim->prox = aux;
+		}
+		f->fim = aux;
+		return;
 	}
 }
 
-t_aluno removeElemento(Pilha *p){
-	No *aux = p->topo;
+t_aluno removeElemento(Fila *f){
+	No *aux = f->inicio;
 	t_aluno dado;
-	
 	if(aux != NULL){
-		printf("\tERRO: Fila vazia");
-		return dado;
-	} 
-	else {
-		p->topo = aux->prox;
+		f->inicio = aux->prox;
 		aux->prox = NULL;
 		dado = aux->dado;
 		free(aux);
+		if(f->inicio == NULL){
+			f->fim = NULL;
+		}
+		return dado;
+	} else {
+		printf("\tERRO: Fila vazia");
 		return dado;	
 	}
 }
 
-void mostraPilha(Pilha *p){
-	No *aux = p->topo;
-	if( aux == NULL){
-		
-		printf("\tERRO: Pilha vazia");
-		return;
-		
-	} else {
+void mostraFila(Fila *f){
+	No *aux = f->inicio;
+	if( aux != NULL){
 		while( aux != NULL){
 			printf(" RA: %d", aux->dado.ra);
 			printf(" NOTA1: %d", aux->dado.nota1);
@@ -66,9 +69,13 @@ void mostraPilha(Pilha *p){
 			printf(" FALTAS: %d", aux->dado.faltas);
 			printf("\n");
 			aux = aux->prox;
-		
+		}
+	} else {
+		printf("\tERRO: Fila vazia");
+		return;
 	}
 }
+
 
 t_aluno recebe_dados() //insercao dos dados
 {
@@ -86,24 +93,24 @@ t_aluno recebe_dados() //insercao dos dados
 
 
 int main(){
-	Pilha *algoritimos = (Pilha*) malloc(sizeof(Pilha));
-	iniciaPilha(algoritimos);
+	Fila *algoritimos = (Fila*) malloc(sizeof(Fila));
+	iniciaFila(algoritimos);
 	char tecla;
 	t_aluno aluno;
 	
 	
 	while (tecla!='S' && tecla!='s')
 	{
-	  printf("[I]nserir [M]ostrar [R]emover [P]rimeiro [S]air\n");
+	  printf("[I]nserir [M]ostrar [R]emover [S]air\n");
 	  tecla=getch(); 
 	  if (tecla=='i' || tecla=='I')     
 	  {
 		aluno=recebe_dados();
-		inseriPilha(aluno, algoritimos);		
+		inseriFila(aluno, algoritimos);		
 	  } 
 	  else if (tecla=='m' || tecla=='M')
 	  {
-	  	mostraPilha(algoritimos);
+	  	mostraFila(algoritimos);
 	  } 
 	  else if (tecla=='r' || tecla=='R')
 	  {
