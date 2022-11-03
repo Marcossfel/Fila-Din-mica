@@ -1,135 +1,123 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-#include <stdio.h>
 
-struct no *inicio = NULL;
-struct no *fim_fila = NULL;
-
-int tamanho=0;
-
-struct no{
-	int dado;
-	struct no *prox;
+struct t_aluno
+{
+	int ra,faltas;
+	float nota1,nota2;
 };
 
-void insere(int valor) {
-	struct no *aux;
-	aux = new(struct no);
-	aux->dado = valor;
+typedef struct No{
+	t_aluno dado;
+	struct No *prox;
+}No;
 
-	if(tamanho==0) { //caso seja o primeiro elemento faz com que os ponteiros inicio e fim apontem para ele
-		inicio = aux;
-		fim_fila = aux;
-	}
+typedef struct Pilha{
+	No *topo;
+}Pilha;
 
-	fim_fila->prox = aux; // faz com que o ponteiro prox que fim aponta aponte para aux
-	fim_fila = aux; //fim recebe aux
-	aux->prox = NULL; //ponteiro prox de aux recebe null(ou seja fim da fila)
-
-	tamanho++;//conta quantos elementos tem na fila
-	printf("\n\n\nElemento inserido com sucesso");
+void iniciaPilha( Pilha *p){
+	p->topo = NULL;
+	
 }
 
-void exibir_fila() {
-	struct no *aux;
-
-	if(inicio==NULL) {
-		printf("\tERRO: Fila vazia");
+void inseriPilha( t_aluno dado, Pilha *p){
+	No *aux = (No*) malloc(sizeof(No));
+	if(aux == NULL){
+		printf("Erro de alocaÃ§Ã£o.\n");
 		return;
-	}
-
-	aux=inicio;
-
-	while(aux!=NULL) {
-		printf(" %d |", aux -> dado);
-		aux = aux->prox;
+	} else {
+		aux->dado = dado;
+		aux->prox = p->topo;
+		p->topo = aux;
 	}
 }
 
-void remover() {
-	struct no *aux;
-
-	if(inicio==NULL) {
+t_aluno removeElemento(Pilha *p){
+	No *aux = p->topo;
+	t_aluno dado;
+	
+	if(aux != NULL){
 		printf("\tERRO: Fila vazia");
+		return dado;
+	} 
+	else {
+		p->topo = aux->prox;
+		aux->prox = NULL;
+		dado = aux->dado;
+		free(aux);
+		return dado;	
+	}
+}
+
+void mostraPilha(Pilha *p){
+	No *aux = p->topo;
+	if( aux == NULL){
+		
+		printf("\tERRO: Pilha vazia");
 		return;
+		
+	} else {
+		while( aux != NULL){
+			printf(" RA: %d", aux->dado.ra);
+			printf(" NOTA1: %d", aux->dado.nota1);
+			printf(" NOTA2: %d", aux->dado.nota2);
+			printf(" FALTAS: %d", aux->dado.faltas);
+			printf("\n");
+			aux = aux->prox;
+		
 	}
-	aux = inicio;
-	inicio = inicio->prox; //inicio recebe o proximo elemento da fila
-	delete(aux);
-	tamanho--;
-	printf("\n\nElemento removido com sucesso\n");
 }
 
-void menu() {
-
-	printf("\n##############################################");
-	printf("\n#               MENU - FILA                  #");
-	printf("\n#                                            #");
-	printf("\n#	  Digite a opçao desejada            #");
-	printf("\n#                                            #");
-	printf("\n#	 1 = Inserir elemento                #");
-	printf("\n#	 2 = Remover elemento                #");
-	printf("\n#	 3 = Exibir fila                     #");
-	printf("\n#	 4 = Mostrar primeiro elemento       #");
-	printf("\n#	 5 = Sair                            #");
-	printf("\n#                                            #");
-	printf("\n##############################################");
-	printf("\n\n");
+t_aluno recebe_dados() //insercao dos dados
+{
+	t_aluno a;
+	printf ("RA    :");
+	scanf ("%d",&a.ra);
+	printf ("NOTA1 :");
+	scanf ("%f",&a.nota1);
+	printf ("NOTA2 :");
+	scanf ("%f",&a.nota2);
+	printf ("FALTAS:");
+	scanf ("%d",&a.faltas);
+	return a;
 }
 
-void mostrar_primeiro() {
-	if(inicio==NULL) {
-		printf("\tERRO: Fila vazia");
-		return;
+
+int main(){
+	Pilha *algoritimos = (Pilha*) malloc(sizeof(Pilha));
+	iniciaPilha(algoritimos);
+	char tecla;
+	t_aluno aluno;
+	
+	
+	while (tecla!='S' && tecla!='s')
+	{
+	  printf("[I]nserir [M]ostrar [R]emover [P]rimeiro [S]air\n");
+	  tecla=getch(); 
+	  if (tecla=='i' || tecla=='I')     
+	  {
+		aluno=recebe_dados();
+		inseriPilha(aluno, algoritimos);		
+	  } 
+	  else if (tecla=='m' || tecla=='M')
+	  {
+	  	mostraPilha(algoritimos);
+	  } 
+	  else if (tecla=='r' || tecla=='R')
+	  {
+	  	removeElemento(algoritimos);
+	  }
+	  
+	  else if (tecla=='s' || tecla=='S')
+	  {
+	   printf("Saindo\n");
+	  } 
+	  else
+	  {
+		printf("Opcao invalida\n");
+	  }
 	}
-	printf("\nO primeiro elemento da fila = %d", inicio->dado);
-}
-
-main() {
-
-	int opcao,valor;
-	bool i=true;
-
-	menu();
-
-	do {
-		opcao = getche()-'0';
-
-		switch(opcao) {
-			case 1:
-				system ("cls");
-				menu();
-				printf("\nDigite o valor a ser inserido ");
-				scanf("%d", &valor);
-				insere(valor);
-				printf("\n\n\n\nEscolha outra opçao para continuar...\n\n");
-				break;
-			case 2:
-				system ("cls");
-				menu();
-				remover();
-				printf("\n\n\n\nEscolha outra opçao para continuar...\n\n");
-				break;
-			case 3:
-				system ("cls");
-				menu();
-				exibir_fila();
-				printf("\n\n\n\nEscolha outra opçao para continuar...\n\n");
-				break;
-			case 4:
-				system ("cls");
-				menu();
-				mostrar_primeiro();
-				printf("\n\n\n\nEscolha outra opçao para continuar...\n\n");
-				break;
-			case 5:
-				system ("cls");
-				printf("\n\n\Até logo !!\n\n\n\n\n\n\n\n\n\n");
-				i=false;
-				break;
-		}
-	}
-	while(i==true);
-
-	system ("pause");
+	return 0;
 }
